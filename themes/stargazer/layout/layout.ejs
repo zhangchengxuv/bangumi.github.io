@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f8f6f1">
+  <meta name="theme-color" content="#0b111c">
   <meta name="description" content="<%= page.description || page.excerpt || config.description %>">
   <title><%= page.title && page.title !== '首页' ? page.title + ' · ' : '' %><%= config.title %></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,5 +22,8 @@
   <%- css('css/bangumi-custom') %>
   <%- partial('_partial/footer') %>
   <script src="<%- url_for('/js/site.js') %>" defer></script>
+  <% if (page.path && page.path.startsWith('bangumis/')) { %>
+    <script src="<%- url_for('/js/bangumi-infinite.js') %>" defer></script>
+  <% } %>
 </body>
 </html>

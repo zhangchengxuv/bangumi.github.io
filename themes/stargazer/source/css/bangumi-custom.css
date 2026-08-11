@@ -1,19 +1,20 @@
 body.bangumi-route {
-  --paper: #0c0f14;
-  --paper-deep: #151922;
-  --ink: #f2f4f7;
-  --muted: #9299a6;
-  --line: rgba(255, 255, 255, .09);
+  --paper: #0b111c;
+  --paper-deep: #121d2d;
+  --ink: #f3f7ff;
+  --muted: #91a2ba;
+  --line: rgba(180, 207, 244, .13);
   --card: transparent;
   color: var(--ink);
   background:
-    radial-gradient(circle at 50% 115%, rgba(38, 76, 132, .88), transparent 43%),
-    #0c0f14;
+    radial-gradient(circle at 52% 115%, rgba(38, 83, 151, .8), transparent 46%),
+    radial-gradient(circle at 90% 20%, rgba(35, 77, 135, .22), transparent 30%),
+    #0b111c;
   background-attachment: fixed;
 }
 
 .bangumi-route .site-header.scrolled {
-  background: rgba(12, 15, 20, .84);
+  background: rgba(11, 17, 28, .84);
 }
 
 .bangumi-route .ambient { display: none; }
@@ -174,10 +175,28 @@ body.bangumi-route {
 }
 
 .bangumi-page .bangumi-pagination {
-  grid-column: 1 / -1;
-  margin: 10px 0 0 !important;
-  gap: 7px !important;
+  display: none !important;
 }
+
+.bangumi-scroll-sentinel {
+  width: 100%;
+  height: 2px;
+  margin-top: 30px;
+}
+
+.bangumi-scroll-sentinel:not(.finished)::after {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto;
+  border: 2px solid rgba(145, 162, 186, .25);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: bangumi-spin .8s linear infinite;
+}
+
+@keyframes bangumi-spin { to { transform: rotate(360deg); } }
 
 .bangumi-page .bangumi-button,
 .bangumi-page .bangumi-pagenum {

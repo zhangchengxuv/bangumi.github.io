@@ -1,6 +1,6 @@
 <header class="site-header">
   <div class="nav-wrap shell">
-    <a class="brand" href="<%- url_for('/') %>" aria-label="返回首页">
+    <a class="brand" href="<%- url_for('/bangumis/') %>" aria-label="进入追番页面">
       <span class="brand-orbit" aria-hidden="true"><i></i></span>
       <span><b><%= config.title %></b><small>ANIME LOG</small></span>
     </a>
@@ -10,8 +10,5 @@
         <a class="<%= active ? 'active' : '' %>" href="<%- url_for(path) %>"><%= name %></a>
       <% }) %>
     </nav>
-    <button class="theme-toggle" type="button" aria-label="切换深浅色" title="切换深浅色">
-      <span class="sun">☼</span><span class="moon">☾</span>
-    </button>
   </div>
 </header>
