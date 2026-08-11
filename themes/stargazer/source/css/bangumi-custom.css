@@ -40,6 +40,42 @@ body.bangumi-route {
   font-family: "DM Sans", "Noto Sans SC", sans-serif !important;
 }
 
+.bangumi-page .bangumi-container[hidden] { display: none !important; }
+
+.collection-switch {
+  margin: 0 0 18px;
+  display: inline-flex;
+  gap: 26px;
+  border-bottom: 1px solid var(--line);
+}
+
+.collection-switch button {
+  position: relative;
+  padding: 0 2px 11px;
+  color: var(--muted);
+  border: 0;
+  background: transparent;
+  font: 600 15px/1.2 "Noto Sans SC", sans-serif;
+  cursor: pointer;
+}
+
+.collection-switch button::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  transform: scaleX(0);
+  border-radius: 99px;
+  background: linear-gradient(90deg, #5799ff, #9ecbff);
+  transition: transform .2s ease;
+}
+
+.collection-switch button:hover,
+.collection-switch button.active { color: var(--ink); }
+.collection-switch button.active::after { transform: scaleX(1); }
+
 .bangumi-page .bangumi-quote { display: none !important; }
 
 .bangumi-page .bangumi-tabs {
@@ -81,6 +117,42 @@ body.bangumi-route {
   align-items: start;
 }
 
+.bangumi-initial-heading {
+  grid-column: 1 / -1;
+  margin: 5px 4px -11px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  color: #dbe9ff;
+  font: 700 17px/1 "DM Sans", sans-serif;
+  scroll-margin-top: 108px;
+}
+
+.bangumi-initial-heading span {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(128, 180, 255, .3);
+  border-radius: 9px;
+  background: rgba(82, 144, 233, .11);
+}
+
+.bangumi-initial-heading i {
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, rgba(126, 176, 247, .32), transparent);
+}
+
+.bangumi-page .bangumi-initial-heading.bangumi-hide { display: none !important; }
+
+.collection-empty {
+  grid-column: 1 / -1;
+  margin: 56px 0;
+  color: var(--muted);
+  text-align: center;
+}
+
 .bangumi-page .bangumi-item {
   display: block !important;
   min-width: 0 !important;
@@ -108,6 +180,11 @@ body.bangumi-route {
   border-radius: 12px !important;
   background: #191e27 !important;
 }
+
+.bangumi-page .book-container .bangumi-picture,
+.bangumi-page .game-container .bangumi-picture { aspect-ratio: 3 / 4; }
+.bangumi-page .book-container .bangumi-picture img,
+.bangumi-page .game-container .bangumi-picture img { object-position: center top !important; }
 
 .bangumi-page .bangumi-picture::after {
   content: "";

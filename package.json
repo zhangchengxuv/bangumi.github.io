@@ -8,8 +8,11 @@
     "clean": "hexo clean",
     "build": "hexo clean && hexo generate",
     "dev": "hexo server",
-    "sync:bangumi": "hexo bangumi -u",
-    "publish:preview": "hexo bangumi -u && hexo clean && hexo generate"
+    "sync:anime": "hexo bangumi -u",
+    "sync:books": "hexo books -u",
+    "sync:games": "hexo games -u",
+    "sync:bangumi": "hexo bangumi -u && hexo books -u && hexo games -u",
+    "publish:preview": "hexo bangumi -u && hexo books -u && hexo games -u && hexo clean && hexo generate"
   },
   "engines": {
     "node": ">=20"

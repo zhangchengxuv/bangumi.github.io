@@ -1,6 +1,9 @@
 <% const item = page.bangumi; %>
+<% const isBook = item.media === 'book'; %>
+<% const isGame = item.media === 'game'; %>
+<% const progressCount = item.progressCount ?? item.ep_status ?? 0; %>
 <article class="subject-detail shell">
-  <a class="subject-back" href="<%- url_for('/bangumis/') %>">← 返回追番列表</a>
+  <a class="subject-back" href="<%- url_for('/bangumis/') %>">← 返回收藏列表</a>
   <div class="subject-card">
     <div class="subject-cover">
       <img src="<%- item.cover %>" alt="<%= item.title %>" referrerpolicy="no-referrer">
@@ -9,16 +12,16 @@
       <p class="subject-kicker"><%= item.status %> · WORLD LINE <%= item.id %></p>
       <h1><%= item.title %></h1>
       <div class="subject-meta">
-        <span><small>类型</small><b><%= item.type || '动画' %></b></span>
+        <span><small>类型</small><b><%= item.type || (isBook ? '书籍' : isGame ? '游戏' : '动画') %></b></span>
         <span><small>标签</small><b><%= item.tags || '—' %></b></span>
         <span><small>评分</small><b><%= item.score || '—' %></b></span>
-        <span><small>话数</small><b><%= item.totalCount || '—' %></b></span>
+        <span><small><%= isBook ? '卷 / 话数' : isGame ? '章节' : '话数' %></small><b><%= item.totalCount || '—' %></b></span>
       </div>
       <% if (item.totalCount) { %>
         <div class="subject-progress">
-          <div style="width:<%= Math.min(100, Math.round(((item.progress || 0) / item.totalCount) * 100)) %>%"></div>
+          <div style="width:<%= Math.min(100, Math.round((progressCount / item.totalCount) * 100)) %>%"></div>
         </div>
-        <p class="subject-progress-label">观看进度 <%= item.progress || 0 %> / <%= item.totalCount %></p>
+        <p class="subject-progress-label"><%= isBook ? '阅读进度' : isGame ? '游玩进度' : '观看进度' %> <%= progressCount %> / <%= item.totalCount %></p>
       <% } %>
       <div class="subject-summary"><%= item.des || 'Bangumi 暂无简介。' %></div>
       <% if (item.myComment) { %><blockquote><%= item.myComment %></blockquote><% } %>

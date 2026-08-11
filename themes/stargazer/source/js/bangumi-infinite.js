@@ -11,15 +11,21 @@
   let visibleCount = 0;
   let sentinel = null;
   let alphaNav = null;
+  let currentMedia = 'anime';
 
   const titleOf = item => item.querySelector('.bangumi-title')?.textContent.trim() || '';
   const itemsOf = panel => [...panel.querySelectorAll(':scope > .bangumi-item')];
   const subjectIdOf = item => item.querySelector('.bangumi-title a')?.href.match(/\/subject\/(\d+)/)?.[1] || '';
+  const safeText = value => String(value ?? '');
+  const escapeHTML = value => safeText(value).replace(/[&<>'"]/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  })[character]);
 
   function decorateItem(item, initialMap, detailBase) {
     const id = subjectIdOf(item);
     const titleLink = item.querySelector('.bangumi-title a');
-    const initial = initialMap[id] || (/^[a-z]/i.test(titleOf(item)) ? titleOf(item)[0].toUpperCase() : '#');
+    const initial = item.dataset.initial || initialMap[id]
+      || (/^[a-z]/i.test(titleOf(item)) ? titleOf(item)[0].toUpperCase() : '#');
     const detailUrl = `${detailBase}${id}/`;
     item.dataset.initial = LETTERS.includes(initial) ? initial : '#';
 
@@ -42,12 +48,37 @@
     }
   }
 
-  function sortPanel(panel) {
+  function sortAndGroup(panel) {
+    panel.querySelectorAll(':scope > .bangumi-initial-heading').forEach(heading => heading.remove());
     const items = itemsOf(panel).sort((a, b) => {
       const initialDifference = LETTERS.indexOf(a.dataset.initial) - LETTERS.indexOf(b.dataset.initial);
       return initialDifference || collator.compare(titleOf(a), titleOf(b));
     });
-    items.forEach(item => panel.appendChild(item));
+
+    let lastInitial = null;
+    const fragment = document.createDocumentFragment();
+    items.forEach(item => {
+      if (item.dataset.initial !== lastInitial) {
+        lastInitial = item.dataset.initial;
+        const heading = document.createElement('h2');
+        heading.className = 'bangumi-initial-heading bangumi-hide';
+        heading.dataset.initial = lastInitial;
+        heading.id = `${panel.id}-initial-${lastInitial === '#' ? 'number' : lastInitial}`;
+        heading.innerHTML = `<span>${lastInitial}</span><i></i>`;
+        fragment.appendChild(heading);
+      }
+      fragment.appendChild(item);
+    });
+    panel.appendChild(fragment);
+  }
+
+  function refreshHeadings(panel) {
+    panel.querySelectorAll(':scope > .bangumi-initial-heading').forEach(heading => {
+      const hasVisibleItem = itemsOf(panel).some(item => (
+        item.dataset.initial === heading.dataset.initial && !item.classList.contains('bangumi-hide')
+      ));
+      heading.classList.toggle('bangumi-hide', !hasVisibleItem);
+    });
   }
 
   function updateNav() {
@@ -70,6 +101,7 @@
     });
 
     visibleCount += nextItems.length;
+    refreshHeadings(activePanel);
     sentinel?.classList.toggle('finished', visibleCount >= items.length);
   }
 
@@ -78,6 +110,7 @@
     activePanel = panel;
     visibleCount = 0;
     itemsOf(panel).forEach(item => item.classList.add('bangumi-hide'));
+    panel.querySelectorAll(':scope > .bangumi-initial-heading').forEach(heading => heading.classList.add('bangumi-hide'));
     loadNextBatch();
     updateNav();
   }
@@ -88,13 +121,17 @@
     const index = items.findIndex(item => item.dataset.initial === letter);
     if (index < 0) return;
 
-    const requiredCount = Math.min(items.length, Math.ceil((index + 1) / BATCH_SIZE) * BATCH_SIZE);
+    const groupEnd = items.findIndex((item, itemIndex) => itemIndex > index && item.dataset.initial !== letter);
+    const requiredIndex = groupEnd < 0 ? items.length : groupEnd;
+    const requiredCount = Math.min(items.length, Math.ceil(requiredIndex / BATCH_SIZE) * BATCH_SIZE);
     items.slice(0, requiredCount).forEach(item => item.classList.remove('bangumi-hide'));
     visibleCount = Math.max(visibleCount, requiredCount);
+    refreshHeadings(activePanel);
     sentinel?.classList.toggle('finished', visibleCount >= items.length);
 
-    const target = items[index];
+    const heading = activePanel.querySelector(`:scope > .bangumi-initial-heading[data-initial="${letter}"]`);
     requestAnimationFrame(() => {
+      const target = heading || items[index];
       window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 108, behavior: 'smooth' });
     });
   }
@@ -114,46 +151,137 @@
     document.body.appendChild(alphaNav);
   }
 
+  function createCollectionItem(item, detailBase) {
+    const element = document.createElement('div');
+    element.className = 'bangumi-item';
+    element.dataset.initial = item.initial || '#';
+    const detailUrl = `${detailBase}${safeText(item.id)}/`;
+    const progress = Number(item.progressCount ?? item.ep_status ?? 0);
+    const total = Number(item.totalCount || 0);
+    const percentage = total ? Math.min(100, Math.round((progress / total) * 100)) : 0;
+    const image = escapeHTML(safeText(item.cover).replace(/^http:/, 'https:'));
+    const title = escapeHTML(item.title);
+
+    element.innerHTML = `
+      <div class="bangumi-picture">
+        <a class="bangumi-cover-link" href="${detailUrl}" aria-label="查看《${title}》资料">
+          <img src="${image}" alt="${title}" referrerpolicy="no-referrer" loading="lazy">
+        </a>
+      </div>
+      <div class="bangumi-info">
+        <div class="bangumi-title"><a href="${detailUrl}">${title}</a></div>
+        ${total ? `<div class="bangumi-progress"><div class="progress-bar" style="width:${percentage}%"></div></div>` : ''}
+      </div>`;
+    return element;
+  }
+
+  function createCollectionContainer(data, detailBase, { media, noun }) {
+    const container = document.createElement('div');
+    container.className = `bangumi-container ${media}-container`;
+    container.dataset.media = media;
+    container.hidden = true;
+
+    const items = ['wantWatch', 'watching', 'watched']
+      .flatMap(key => Array.isArray(data[key]) ? data[key] : []);
+    const panel = document.createElement('div');
+    panel.id = `${media}-items`;
+    panel.className = 'bangumi-show';
+    items.forEach(item => panel.appendChild(createCollectionItem(item, detailBase)));
+    if (!items.length) {
+      const empty = document.createElement('p');
+      empty.className = 'collection-empty';
+      empty.textContent = `这里还没有收藏的${noun}`;
+      panel.appendChild(empty);
+    }
+    sortAndGroup(panel);
+    container.appendChild(panel);
+    return container;
+  }
+
+  function createMediaSwitch(page, containers) {
+    const nav = document.createElement('div');
+    nav.className = 'collection-switch';
+    nav.setAttribute('aria-label', '收藏类型');
+    const choices = [['anime', '动画'], ['book', '我的书籍'], ['game', '我的游戏']];
+
+    choices.forEach(([media, label]) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.media = media;
+      button.className = media === 'anime' ? 'active' : '';
+      button.textContent = label;
+      button.addEventListener('click', () => {
+        currentMedia = media;
+        nav.querySelectorAll('button').forEach(choice => choice.classList.toggle('active', choice === button));
+        Object.entries(containers).forEach(([key, container]) => {
+          container.hidden = key !== media;
+        });
+        const container = containers[media];
+        activate(container.querySelector('.bangumi-show'));
+      });
+      nav.appendChild(button);
+    });
+
+    page.insertBefore(nav, containers.anime);
+    containers.anime.insertAdjacentElement('afterend', containers.book);
+    containers.book.insertAdjacentElement('afterend', containers.game);
+  }
+
   async function init() {
     const page = document.querySelector('.bangumi-page');
-    const container = page?.querySelector('.bangumi-container');
-    if (!container || container.dataset.infiniteReady) return;
-    container.dataset.infiniteReady = 'true';
+    const animeContainer = page?.querySelector('.bangumi-container');
+    if (!animeContainer || animeContainer.dataset.infiniteReady) return;
+    animeContainer.dataset.infiniteReady = 'true';
+    animeContainer.dataset.media = 'anime';
 
     let initialMap = {};
+    let bookData = { wantWatch: [], watching: [], watched: [] };
+    let gameData = { wantWatch: [], watching: [], watched: [] };
     try {
-      const response = await fetch(new URL('initials.json', window.location.href));
-      if (response.ok) initialMap = await response.json();
+      const [initialResponse, bookResponse, gameResponse] = await Promise.all([
+        fetch(new URL('initials.json', window.location.href)),
+        fetch(new URL('books.json', window.location.href)),
+        fetch(new URL('games.json', window.location.href))
+      ]);
+      if (initialResponse.ok) initialMap = await initialResponse.json();
+      if (bookResponse.ok) bookData = await bookResponse.json();
+      if (gameResponse.ok) gameData = await gameResponse.json();
     } catch (_) {
-      // The list still works; non-Latin titles fall back to the # group.
+      // 动画列表仍可使用；同步失败时书籍分类显示为空。
     }
 
     const detailBase = page.dataset.detailBase || './subject/';
-    const panels = [...container.querySelectorAll('[id^="bangumi-item"]')];
-    panels.forEach(panel => {
-      itemsOf(panel).forEach(item => decorateItem(item, initialMap, detailBase));
-      sortPanel(panel);
+    const originalAnimePanels = [...animeContainer.querySelectorAll('[id^="bangumi-item"]')];
+    const animePanel = document.createElement('div');
+    animePanel.id = 'anime-items';
+    animePanel.className = 'bangumi-show';
+    originalAnimePanels.forEach(panel => {
+      itemsOf(panel).forEach(item => animePanel.appendChild(item));
+      panel.remove();
     });
+    animeContainer.querySelector('.bangumi-tabs')?.remove();
+    animeContainer.appendChild(animePanel);
+    itemsOf(animePanel).forEach(item => decorateItem(item, initialMap, detailBase));
+    sortAndGroup(animePanel);
 
-    // Remove the plugin pager from the DOM so its old click handlers cannot freeze the page.
-    container.querySelectorAll('.bangumi-pagination').forEach(pager => pager.remove());
+    animeContainer.querySelectorAll('.bangumi-pagination').forEach(pager => pager.remove());
+    const bookContainer = createCollectionContainer(bookData, detailBase, {
+      media: 'book',
+      noun: '书籍'
+    });
+    const gameContainer = createCollectionContainer(gameData, detailBase, {
+      media: 'game',
+      noun: '游戏'
+    });
+    createMediaSwitch(page, { anime: animeContainer, book: bookContainer, game: gameContainer });
     createAlphaNav();
 
     sentinel = document.createElement('div');
     sentinel.className = 'bangumi-scroll-sentinel';
     sentinel.setAttribute('aria-hidden', 'true');
-    container.appendChild(sentinel);
+    page.appendChild(sentinel);
 
-    container.querySelectorAll('.bangumi-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        setTimeout(() => activate(document.getElementById(tab.id.replace('tab', 'item'))), 0);
-      });
-    });
-
-    const selectedTab = container.querySelector('.bangumi-tab.bangumi-active');
-    activate(selectedTab
-      ? document.getElementById(selectedTab.id.replace('tab', 'item'))
-      : container.querySelector('.bangumi-show'));
+    activate(animePanel);
 
     new IntersectionObserver(entries => {
       if (entries.some(entry => entry.isIntersecting)) loadNextBatch();
