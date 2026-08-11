@@ -103,7 +103,10 @@
     nextItems.forEach(item => {
       item.classList.remove('bangumi-hide');
       const image = item.querySelector('img[data-bangumi-src]');
-      if (image && !image.getAttribute('src')) image.src = image.dataset.bangumiSrc;
+      if (image && !image.getAttribute('src')) {
+        image.loading = 'eager';
+        image.src = image.dataset.bangumiSrc;
+      }
     });
 
     visibleCount += nextItems.length;
@@ -171,7 +174,7 @@
     element.innerHTML = `
       <div class="bangumi-picture">
         <a class="bangumi-cover-link" href="${detailUrl}" aria-label="查看《${title}》资料">
-          <img src="${image}" alt="${title}" referrerpolicy="no-referrer" loading="lazy">
+          <img data-bangumi-src="${image}" alt="${title}" referrerpolicy="no-referrer" loading="lazy">
         </a>
       </div>
       <div class="bangumi-info">
