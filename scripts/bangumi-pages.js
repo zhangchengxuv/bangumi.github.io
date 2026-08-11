@@ -16,13 +16,32 @@ function readDataFile(name) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
 }
 
-function flattenCollection(data, media) {
+function readCoverManifest() {
+  const file = path.join(hexo.source_dir, 'covers', 'manifest.json');
+  if (!fs.existsSync(file)) return { covers: {} };
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch (_) {
+    return { covers: {} };
+  }
+}
+
+function hostedCover(item, media, manifest) {
+  const entry = manifest.covers?.[`${media}:${item.id}`];
+  if (!entry?.path) return item.cover;
+  const root = String(hexo.config.root || '/').replace(/\/?$/, '/');
+  return `${root}${String(entry.path).replace(/^\//, '')}`;
+}
+
+function flattenCollection(data, media, manifest) {
   const groups = [data.wantWatch || [], data.watching || [], data.watched || []];
   const unique = new Map();
   groups.forEach((items, index) => {
     items.forEach(item => unique.set(String(item.id), {
       ...item,
       media,
+      coverOriginal: item.cover,
+      cover: hostedCover(item, media, manifest),
       status: STATUS_LABELS[media][index],
     }));
   });
@@ -39,10 +58,16 @@ function getInitial(title = '') {
   return /[A-Z]/.test(initial) ? initial : '#';
 }
 
-function withInitials(data, media) {
+function withInitials(data, media, manifest) {
   return Object.fromEntries(Object.entries(data).map(([key, items]) => [
     key,
-    (items || []).map(item => ({ ...item, media, initial: getInitial(item.title) })),
+    (items || []).map(item => ({
+      ...item,
+      media,
+      coverOriginal: item.cover,
+      cover: hostedCover(item, media, manifest),
+      initial: getInitial(item.title),
+    })),
   ]));
 }
 
@@ -50,9 +75,10 @@ hexo.extend.generator.register('bangumi-subject-pages', function () {
   const animeData = readDataFile('bangumis.json');
   const bookData = readDataFile('books.json');
   const gameData = readDataFile('games.json');
-  const animeItems = flattenCollection(animeData, 'anime');
-  const bookItems = flattenCollection(bookData, 'book');
-  const gameItems = flattenCollection(gameData, 'game');
+  const manifest = readCoverManifest();
+  const animeItems = flattenCollection(animeData, 'anime', manifest);
+  const bookItems = flattenCollection(bookData, 'book', manifest);
+  const gameItems = flattenCollection(gameData, 'game', manifest);
   const items = [...animeItems, ...bookItems, ...gameItems];
 
   const pages = items.map(item => ({
@@ -71,12 +97,12 @@ hexo.extend.generator.register('bangumi-subject-pages', function () {
 
   pages.push({
     path: 'books.json',
-    data: JSON.stringify(withInitials(bookData, 'book')),
+    data: JSON.stringify(withInitials(bookData, 'book', manifest)),
   });
 
   pages.push({
     path: 'games.json',
-    data: JSON.stringify(withInitials(gameData, 'game')),
+    data: JSON.stringify(withInitials(gameData, 'game', manifest)),
   });
 
   return pages;

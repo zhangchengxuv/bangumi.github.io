@@ -6,7 +6,7 @@
   <a class="subject-back" href="<%- url_for('/') %>">← 返回收藏列表</a>
   <div class="subject-card">
     <div class="subject-cover">
-      <img src="<%- item.cover %>" alt="<%= item.title %>" referrerpolicy="no-referrer">
+      <img src="<%- local_bangumi_cover(item, item.media || 'anime') %>" alt="<%= item.title %>" referrerpolicy="no-referrer">
     </div>
     <div class="subject-copy">
       <p class="subject-kicker"><%= item.status %> · WORLD LINE <%= item.id %></p>

@@ -37,6 +37,17 @@ jobs:
       - name: Sync Bangumi collection
         run: npm run sync:bangumi
 
+      - name: Restore hosted cover cache
+        uses: actions/cache@v4
+        with:
+          path: source/covers
+          key: ${{ runner.os }}-bangumi-covers-${{ hashFiles('source/_data/bangumis.json', 'source/_data/books.json', 'source/_data/games.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bangumi-covers-
+
+      - name: Host Bangumi covers
+        run: npm run sync:covers
+
       - name: Sync GitHub activity
         run: npm run sync:github
         env:
