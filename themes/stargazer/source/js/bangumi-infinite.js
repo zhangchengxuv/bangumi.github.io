@@ -231,6 +231,7 @@
     const page = document.querySelector('.bangumi-page');
     const animeContainer = page?.querySelector('.bangumi-container');
     if (!animeContainer || animeContainer.dataset.infiniteReady) return;
+    const revealFallback = window.setTimeout(() => page.classList.add('collections-ready'), 5000);
     animeContainer.dataset.infiniteReady = 'true';
     animeContainer.dataset.media = 'anime';
 
@@ -286,6 +287,9 @@
     new IntersectionObserver(entries => {
       if (entries.some(entry => entry.isIntersecting)) loadNextBatch();
     }, { rootMargin: '900px 0px' }).observe(sentinel);
+
+    window.clearTimeout(revealFallback);
+    page.classList.add('collections-ready');
   }
 
   if (document.readyState === 'complete') init();
