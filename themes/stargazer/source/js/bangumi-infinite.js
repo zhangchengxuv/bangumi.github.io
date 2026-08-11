@@ -264,10 +264,19 @@
   }
 
   function createMediaSwitch(page, containers) {
+    const toolbar = document.createElement('div');
+    toolbar.className = 'collection-toolbar';
+
     const nav = document.createElement('div');
     nav.className = 'collection-switch';
     nav.setAttribute('aria-label', '收藏类型');
     const choices = [['anime', '动画'], ['book', '我的书籍'], ['game', '我的游戏'], ['github', 'GitHub 活动']];
+
+    const animeTotal = itemsOf(containers.anime.querySelector('.bangumi-show')).length;
+    const counter = document.createElement('div');
+    counter.className = 'collection-counter';
+    counter.setAttribute('aria-label', `\u89c2\u770b\u603b\u6570 ${animeTotal} \u90e8`);
+    counter.innerHTML = `<span>WATCHED SIGNALS</span><strong>${animeTotal}</strong><small>\u89c2\u770b\u603b\u6570</small>`;
 
     choices.forEach(([media, label]) => {
       const button = document.createElement('button');
@@ -283,6 +292,7 @@
         });
         if (alphaNav) alphaNav.hidden = media === 'github';
         if (sentinel) sentinel.hidden = media === 'github';
+        counter.hidden = media !== 'anime';
         if (media === 'github') {
           activePanel = null;
           return;
@@ -293,7 +303,9 @@
       nav.appendChild(button);
     });
 
-    page.insertBefore(nav, containers.anime);
+    toolbar.appendChild(nav);
+    toolbar.appendChild(counter);
+    page.insertBefore(toolbar, containers.anime);
     containers.anime.insertAdjacentElement('afterend', containers.book);
     containers.book.insertAdjacentElement('afterend', containers.game);
     containers.game.insertAdjacentElement('afterend', containers.github);
