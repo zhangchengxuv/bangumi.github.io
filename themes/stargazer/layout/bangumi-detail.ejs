@@ -1,0 +1,28 @@
+<% const item = page.bangumi; %>
+<article class="subject-detail shell">
+  <a class="subject-back" href="<%- url_for('/bangumis/') %>">← 返回追番列表</a>
+  <div class="subject-card">
+    <div class="subject-cover">
+      <img src="<%- item.cover %>" alt="<%= item.title %>" referrerpolicy="no-referrer">
+    </div>
+    <div class="subject-copy">
+      <p class="subject-kicker"><%= item.status %> · WORLD LINE <%= item.id %></p>
+      <h1><%= item.title %></h1>
+      <div class="subject-meta">
+        <span><small>类型</small><b><%= item.type || '动画' %></b></span>
+        <span><small>标签</small><b><%= item.tags || '—' %></b></span>
+        <span><small>评分</small><b><%= item.score || '—' %></b></span>
+        <span><small>话数</small><b><%= item.totalCount || '—' %></b></span>
+      </div>
+      <% if (item.totalCount) { %>
+        <div class="subject-progress">
+          <div style="width:<%= Math.min(100, Math.round(((item.progress || 0) / item.totalCount) * 100)) %>%"></div>
+        </div>
+        <p class="subject-progress-label">观看进度 <%= item.progress || 0 %> / <%= item.totalCount %></p>
+      <% } %>
+      <div class="subject-summary"><%= item.des || 'Bangumi 暂无简介。' %></div>
+      <% if (item.myComment) { %><blockquote><%= item.myComment %></blockquote><% } %>
+      <a class="subject-official" href="https://bgm.tv/subject/<%= item.id %>" target="_blank" rel="noopener">在 Bangumi 查看完整资料 ↗</a>
+    </div>
+  </div>
+</article>

@@ -20,7 +20,7 @@ body.bangumi-route {
 .bangumi-route .ambient { display: none; }
 
 .bangumi-page {
-  width: min(1600px, calc(100% - 48px));
+  width: min(1540px, calc(100% - 88px));
   max-width: none;
   min-height: calc(100vh - 180px);
   padding: 26px 0 90px;
@@ -129,6 +129,12 @@ body.bangumi-route {
   transition: transform .35s ease !important;
 }
 
+.bangumi-page .bangumi-cover-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .bangumi-page .bangumi-item:hover .bangumi-picture img { transform: scale(1.035); }
 
 .bangumi-page .bangumi-info {
@@ -198,6 +204,66 @@ body.bangumi-route {
 
 @keyframes bangumi-spin { to { transform: rotate(360deg); } }
 
+.alpha-nav {
+  position: fixed;
+  z-index: 130;
+  top: 50%;
+  right: 8px;
+  padding: 5px 3px;
+  display: grid;
+  transform: translateY(-50%);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(11, 17, 28, .76);
+  box-shadow: 0 12px 35px rgba(0, 7, 18, .25);
+  backdrop-filter: blur(14px);
+}
+
+.alpha-nav button {
+  width: 24px;
+  height: 18px;
+  padding: 0;
+  color: var(--muted);
+  border: 0;
+  background: transparent;
+  font: 600 9px/1 "DM Sans", sans-serif;
+  cursor: pointer;
+}
+
+.alpha-nav button:hover,
+.alpha-nav button:focus-visible { color: var(--accent); }
+.alpha-nav button:disabled { opacity: .18; cursor: default; }
+
+.subject-detail { padding: 46px 0 110px; }
+.subject-back { display: inline-block; margin-bottom: 24px; color: var(--muted); font-size: 13px; }
+.subject-card {
+  padding: 34px;
+  display: grid;
+  grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr);
+  gap: 52px;
+  align-items: start;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: linear-gradient(145deg, rgba(27, 49, 79, .78), rgba(12, 21, 34, .72));
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+.subject-cover { position: sticky; top: 112px; overflow: hidden; border-radius: 20px; background: var(--paper-deep); }
+.subject-cover img { width: 100%; aspect-ratio: 3 / 4; display: block; object-fit: cover; }
+.subject-copy { padding: 12px 12px 12px 0; }
+.subject-kicker { margin: 0 0 18px; color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: .2em; }
+.subject-copy h1 { margin: 0 0 28px; font-size: clamp(34px, 4vw, 58px); line-height: 1.16; letter-spacing: -.045em; }
+.subject-meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 22px; }
+.subject-meta span { min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255, 255, 255, .035); }
+.subject-meta small { display: block; margin-bottom: 5px; color: var(--muted); font-size: 10px; }
+.subject-meta b { display: block; overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.subject-progress { height: 4px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.1); }
+.subject-progress div { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #5799ff, #96c5ff); }
+.subject-progress-label { margin: 8px 0 28px; color: var(--muted); font-size: 11px; }
+.subject-summary { color: #c4d0e1; font-size: 15px; line-height: 1.95; white-space: pre-line; }
+.subject-copy blockquote { margin: 26px 0 0; padding: 16px 18px; color: var(--ink); border-left: 3px solid var(--accent); background: rgba(112,169,255,.08); }
+.subject-official { margin-top: 32px; padding: 12px 18px; display: inline-flex; color: #07101e; border-radius: 999px; background: #eef5ff; font-size: 13px; font-weight: 700; }
+
 .bangumi-page .bangumi-button,
 .bangumi-page .bangumi-pagenum {
   min-height: 34px !important;
@@ -222,10 +288,21 @@ body.bangumi-route {
 }
 
 @media (max-width: 640px) {
-  .bangumi-page { width: min(100% - 24px, 560px); padding-top: 18px; }
+  .bangumi-page { width: min(100% - 48px, 540px); margin-left: 12px; margin-right: 36px; padding-top: 18px; }
   .bangumi-page .bangumi-tabs { width: 100% !important; display: flex !important; }
   .bangumi-page .bangumi-tab { flex: 1 !important; min-width: 0 !important; padding-inline: 8px !important; }
   .bangumi-page .bangumi-show { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 11px; }
   .bangumi-page .bangumi-picture { border-radius: 9px !important; }
   .bangumi-page .bangumi-title { font-size: 13px !important; }
+  .alpha-nav { right: 2px; padding-inline: 1px; border-radius: 12px; }
+  .alpha-nav button { width: 20px; height: 15px; font-size: 8px; }
+}
+
+@media (max-width: 820px) {
+  .subject-detail { width: min(100% - 28px, 620px); padding-top: 28px; }
+  .subject-card { padding: 18px; grid-template-columns: 1fr; gap: 25px; border-radius: 22px; }
+  .subject-cover { position: relative; top: auto; max-height: 470px; }
+  .subject-cover img { aspect-ratio: 16 / 11; }
+  .subject-copy { padding: 0 3px 8px; }
+  .subject-meta { grid-template-columns: repeat(2, 1fr); }
 }

@@ -2,13 +2,7 @@
   <div class="nav-wrap shell">
     <a class="brand" href="<%- url_for('/bangumis/') %>" aria-label="进入追番页面">
       <span class="brand-orbit" aria-hidden="true"><i></i></span>
-      <span><b><%= config.title %></b><small>ANIME LOG</small></span>
+      <span><b><%= config.title %></b><small>DIVERGENCE LOG</small></span>
     </a>
-    <nav class="main-nav" aria-label="主导航">
-      <% Object.entries(theme.menu || {}).forEach(([name, path]) => { %>
-        <% const active = path === '/' ? page.path === 'index.html' : page.path && page.path.startsWith(path.replace(/^\//, '')); %>
-        <a class="<%= active ? 'active' : '' %>" href="<%- url_for(path) %>"><%= name %></a>
-      <% }) %>
-    </nav>
   </div>
 </header>

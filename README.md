@@ -2,7 +2,7 @@
 
 一个已经配置好的 Hexo 追番博客。追番数据来自 Bangumi 用户 `829882`，推送到 GitHub 后会自动构建并发布到 GitHub Pages。
 
-当前站点只保留“追番”和“手记”两个入口。访问根地址会直接进入追番页；番剧按中文拼音顺序排列，并在向下滚动时自动加载，无需手动翻页。
+当前站点只保留追番列表及番剧资料页，不显示分类导航。访问根地址会直接进入追番页；番剧按中文拼音顺序排列，并在向下滚动时自动加载，无需手动翻页。
 
 ## 本地预览
 
@@ -28,14 +28,6 @@ pnpm dev
 
 ## 日常使用
 
-新建文章：
-
-```bash
-npx hexo new "文章标题"
-```
-
-文章保存在 `source/_posts/`。编辑完成后提交并推送，GitHub 会自动发布。
-
 手动更新追番数据：
 
 ```bash
@@ -45,9 +37,10 @@ pnpm sync:bangumi
 ## 常用定制
 
 - 网站标题、作者、Bangumi UID：`_config.yml`
-- 导航和页脚：`themes/stargazer/_config.yml`
+- 站名和页脚：`_config.yml`、`themes/stargazer/_config.yml`
 - 主题样式：`themes/stargazer/source/css/style.css`
 - 追番页样式：`themes/stargazer/source/css/bangumi-custom.css`
 - 追番排序与滚动加载：`themes/stargazer/source/js/bangumi-infinite.js`
+- 自动生成番剧资料页：`scripts/bangumi-pages.js`
 
 > Bangumi 收藏需设为公开，插件才能正常读取列表。
