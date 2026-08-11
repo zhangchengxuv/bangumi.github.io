@@ -1,8 +1,24 @@
 <header class="site-header">
   <div class="nav-wrap shell">
-    <a class="brand" href="<%- url_for('/bangumis/') %>" aria-label="进入追番页面">
-      <span class="brand-orbit" aria-hidden="true"><i></i></span>
-      <span><b><%= config.title %></b><small>DIVERGENCE LOG</small></span>
+    <a class="brand" href="<%- url_for('/bangumis/') %>" aria-label="进入收藏页面">
+      <svg class="brand-mark" viewBox="0 0 56 44" aria-hidden="true">
+        <defs>
+          <linearGradient id="worldline-gradient" x1="4" y1="36" x2="50" y2="8" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#4c8eef"/>
+            <stop offset="1" stop-color="#a9d1ff"/>
+          </linearGradient>
+        </defs>
+        <path class="brand-mark-ring" d="M40.8 7.8A18.2 18.2 0 1 0 45.9 33"/>
+        <path class="brand-mark-line" d="M3.5 31.5C13.2 23.1 25.7 16.8 52.4 12.2"/>
+        <path class="brand-mark-line brand-mark-line-alt" d="M6.2 10.5c11.1 2.3 22.1 10 43.6 25.3"/>
+        <path class="brand-mark-axis" d="M28 4.5v35"/>
+        <circle class="brand-mark-core" cx="28" cy="22" r="3.4"/>
+        <circle class="brand-mark-node" cx="47.4" cy="13.2" r="1.8"/>
+      </svg>
+      <span class="brand-copy">
+        <b><%= config.title %></b>
+        <small><i>1.048596</i> WORLD LINE</small>
+      </span>
     </a>
   </div>
 </header>
