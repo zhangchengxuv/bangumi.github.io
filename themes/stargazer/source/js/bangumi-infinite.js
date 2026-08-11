@@ -338,11 +338,17 @@
     let gameData = { wantWatch: [], watching: [], watched: [] };
     let githubData = null;
     try {
+      const syncVersion = Date.now().toString();
+      const latestDataUrl = file => {
+        const url = new URL(file, window.location.href);
+        url.searchParams.set('sync', syncVersion);
+        return url;
+      };
       const [initialResponse, bookResponse, gameResponse, githubResponse] = await Promise.all([
-        fetch(new URL('initials.json', window.location.href)),
-        fetch(new URL('books.json', window.location.href)),
-        fetch(new URL('games.json', window.location.href)),
-        fetch(new URL('github-activity.json', window.location.href))
+        fetch(latestDataUrl('initials.json'), { cache: 'no-store' }),
+        fetch(latestDataUrl('books.json'), { cache: 'no-store' }),
+        fetch(latestDataUrl('games.json'), { cache: 'no-store' }),
+        fetch(latestDataUrl('github-activity.json'), { cache: 'no-store' })
       ]);
       if (initialResponse.ok) initialMap = await initialResponse.json();
       if (bookResponse.ok) bookData = await bookResponse.json();
