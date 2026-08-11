@@ -1,0 +1,14 @@
+<section class="page-hero shell compact">
+  <p class="eyebrow"><span></span> LATEST NOTES</p>
+  <h1>放映手记</h1>
+  <p>一些关于故事、角色与心情的片段。</p>
+</section>
+<section class="post-list shell">
+  <% page.posts.each(post => { %>
+    <article class="list-item">
+      <time><%= date(post.date, 'YYYY.MM.DD') %></time>
+      <div><h2><a href="<%- url_for(post.path) %>"><%= post.title %></a></h2><p><%= post.excerpt || strip_html(post.content).slice(0, 100) %></p></div>
+      <a class="list-arrow" href="<%- url_for(post.path) %>">↗</a>
+    </article>
+  <% }) %>
+</section>

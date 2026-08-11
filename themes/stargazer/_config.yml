@@ -1,0 +1,11 @@
+menu:
+  首页: /
+  追番: /bangumis/
+  手记: /archives/
+  关于: /about/
+
+social:
+  bangumi: https://bgm.tv/user/829882
+
+footer:
+  since: 2026

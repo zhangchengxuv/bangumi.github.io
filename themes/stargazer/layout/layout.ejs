@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="<%= config.language || 'zh-CN' %>">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f6f1">
+  <meta name="description" content="<%= page.description || page.excerpt || config.description %>">
+  <title><%= page.title && page.title !== '首页' ? page.title + ' · ' : '' %><%= config.title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="<%- url_for('/css/style.css') %>">
+  <%- css('css/bangumi-custom') %>
+</head>
+<body class="<%= page.path && page.path.startsWith('bangumis/') ? 'bangumi-route' : '' %>">
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <%- partial('_partial/header') %>
+  <main class="site-main">
+    <%- body %>
+  </main>
+  <%- css('css/bangumi-custom') %>
+  <%- partial('_partial/footer') %>
+  <script src="<%- url_for('/js/site.js') %>" defer></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<section class="hero shell">
+  <div class="hero-copy">
+    <p class="eyebrow"><span></span> MY ANIME UNIVERSE</p>
+    <h1>把看过的故事，<br><em>收进自己的星图。</em></h1>
+    <p class="hero-lead">记录正在追的动画、看完后的余韵，和那些值得反复回望的瞬间。</p>
+    <div class="hero-actions">
+      <a class="button button-primary" href="<%- url_for('/bangumis/') %>">查看我的追番 <span>↗</span></a>
+      <a class="button button-ghost" href="<%- url_for('/archives/') %>">阅读放映手记</a>
+    </div>
+  </div>
+  <div class="hero-visual" aria-hidden="true">
+    <div class="poster poster-back"><span>STORY</span></div>
+    <div class="poster poster-main">
+      <div class="poster-sky"><i></i><i></i><i></i></div>
+      <div class="poster-horizon"></div>
+      <div class="poster-title">NEXT<br>EPISODE</div>
+      <small>PLAYING IN MY UNIVERSE</small>
+    </div>
+    <div class="episode-tag"><b>EP.</b><strong>∞</strong><span>STILL WATCHING</span></div>
+  </div>
+</section>
+
+<section class="now-showing shell">
+  <div class="section-heading">
+    <div><p class="eyebrow"><span></span> NOW SHOWING</p><h2>放映手记</h2></div>
+    <a href="<%- url_for('/archives/') %>">全部手记 <span>→</span></a>
+  </div>
+  <div class="post-grid">
+    <% const posts = site.posts.sort('date', -1).limit(3); %>
+    <% posts.forEach((post, index) => { %>
+      <article class="post-card">
+        <a class="post-card-art art-<%= (index % 3) + 1 %>" href="<%- url_for(post.path) %>">
+          <span class="card-number">0<%= index + 1 %></span>
+          <span class="card-glyph"><%= ['✦', '◌', '△'][index % 3] %></span>
+        </a>
+        <div class="post-meta"><time><%= date(post.date, 'YYYY.MM.DD') %></time><span><%= post.tags && post.tags.length ? post.tags.first().name : '放映手记' %></span></div>
+        <h3><a href="<%- url_for(post.path) %>"><%= post.title %></a></h3>
+        <p><%= post.excerpt || strip_html(post.content).slice(0, 72) %></p>
+      </article>
+    <% }) %>
+  </div>
+</section>
+
+<section class="collection-cta shell">
+  <div>
+    <p class="eyebrow light"><span></span> FULL COLLECTION</p>
+    <h2>我的追番地图</h2>
+    <p>想看、在看、看过。让每一次相遇都有迹可循。</p>
+  </div>
+  <a class="round-arrow" href="<%- url_for('/bangumis/') %>" aria-label="打开追番列表">↗</a>
+</section>

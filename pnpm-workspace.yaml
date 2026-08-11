@@ -1,0 +1,4 @@
+allowBuilds:
+  # Syntax highlighting is disabled in this site, so these optional generated
+  # assets are not needed. Explicit denial also keeps installs non-interactive.
+  hexo-util: false

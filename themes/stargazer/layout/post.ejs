@@ -1,0 +1,9 @@
+<article class="post-detail shell">
+  <header>
+    <p class="eyebrow"><span></span> SCREENING NOTE · <%= date(page.date, 'YYYY.MM.DD') %></p>
+    <h1><%= page.title %></h1>
+    <% if (page.excerpt) { %><p class="post-excerpt"><%= page.excerpt %></p><% } %>
+  </header>
+  <div class="prose"><%- page.content %></div>
+  <a class="back-link" href="<%- url_for('/archives/') %>">← 返回全部手记</a>
+</article>

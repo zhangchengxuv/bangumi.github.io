@@ -1,0 +1,212 @@
+body.bangumi-route {
+  --paper: #0c0f14;
+  --paper-deep: #151922;
+  --ink: #f2f4f7;
+  --muted: #9299a6;
+  --line: rgba(255, 255, 255, .09);
+  --card: transparent;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 50% 115%, rgba(38, 76, 132, .88), transparent 43%),
+    #0c0f14;
+  background-attachment: fixed;
+}
+
+.bangumi-route .site-header.scrolled {
+  background: rgba(12, 15, 20, .84);
+}
+
+.bangumi-route .ambient { display: none; }
+
+.bangumi-page {
+  width: min(1600px, calc(100% - 48px));
+  max-width: none;
+  min-height: calc(100vh - 180px);
+  padding: 26px 0 90px;
+}
+
+.bangumi-page .bangumi-container {
+  --bangumi-bg: transparent !important;
+  --bangumi-surface: rgba(255, 255, 255, .07) !important;
+  --bangumi-surface-strong: rgba(255, 255, 255, .1) !important;
+  --bangumi-text: var(--ink) !important;
+  --bangumi-muted: var(--muted) !important;
+  --bangumi-border: var(--line) !important;
+  --bangumi-accent: #ffffff !important;
+  --bangumi-accent-strong: #ffffff !important;
+  --bangumi-accent-soft: rgba(255, 255, 255, .08) !important;
+  --bangumi-shadow: rgba(0, 0, 0, .28) !important;
+  font-family: "DM Sans", "Noto Sans SC", sans-serif !important;
+}
+
+.bangumi-page .bangumi-quote { display: none !important; }
+
+.bangumi-page .bangumi-tabs {
+  width: auto !important;
+  margin: 0 0 26px !important;
+  padding: 4px !important;
+  display: inline-flex !important;
+  gap: 3px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, .045) !important;
+  backdrop-filter: blur(14px);
+}
+
+.bangumi-page .bangumi-tab {
+  flex: none !important;
+  min-width: 88px !important;
+  margin: 0 !important;
+  padding: 9px 16px !important;
+  color: var(--muted) !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+}
+
+.bangumi-page .bangumi-tab:hover,
+.bangumi-page .bangumi-tab.bangumi-active {
+  color: #11151b !important;
+  background: #f3f4f6 !important;
+  box-shadow: none !important;
+}
+
+.bangumi-page .bangumi-show {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 32px 16px;
+  align-items: start;
+}
+
+.bangumi-page .bangumi-item {
+  display: block !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: transform .2s ease !important;
+}
+
+.bangumi-page .bangumi-item:hover { transform: translateY(-3px); }
+.bangumi-page .bangumi-item.bangumi-hide { display: none !important; }
+
+.bangumi-page .bangumi-picture {
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16 / 9;
+  margin: 0 0 11px !important;
+  overflow: hidden !important;
+  border-radius: 12px !important;
+  background: #191e27 !important;
+}
+
+.bangumi-page .bangumi-picture::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 62%, rgba(0, 0, 0, .24));
+}
+
+.bangumi-page .bangumi-picture img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  display: block !important;
+  object-fit: cover !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transition: transform .35s ease !important;
+}
+
+.bangumi-page .bangumi-item:hover .bangumi-picture img { transform: scale(1.035); }
+
+.bangumi-page .bangumi-info {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+}
+
+.bangumi-page .bangumi-title {
+  min-height: 2.8em;
+  margin: 0 0 5px !important;
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--ink) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.bangumi-page .bangumi-title a { color: inherit !important; }
+.bangumi-page .bangumi-meta,
+.bangumi-page .bangumi-summary,
+.bangumi-page .bangumi-comments { display: none !important; }
+
+.bangumi-page .bangumi-progress {
+  position: relative !important;
+  width: 100% !important;
+  height: 3px !important;
+  margin: 8px 0 0 !important;
+  overflow: hidden !important;
+  border-radius: 99px !important;
+  background: rgba(255, 255, 255, .13) !important;
+}
+
+.bangumi-page .bangumi-progress-text { display: none !important; }
+.bangumi-page .bangumi-progress .progress-bar {
+  height: 100% !important;
+  background: #f2f4f7 !important;
+  opacity: .72 !important;
+}
+
+.bangumi-page .bangumi-pagination {
+  grid-column: 1 / -1;
+  margin: 10px 0 0 !important;
+  gap: 7px !important;
+}
+
+.bangumi-page .bangumi-button,
+.bangumi-page .bangumi-pagenum {
+  min-height: 34px !important;
+  padding: 7px 12px !important;
+  color: var(--muted) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, .045) !important;
+}
+
+.bangumi-page .bangumi-button:hover {
+  color: var(--ink) !important;
+  background: rgba(255, 255, 255, .1) !important;
+}
+
+@media (max-width: 1180px) {
+  .bangumi-page .bangumi-show { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 900px) {
+  .bangumi-page .bangumi-show { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .bangumi-page { width: min(100% - 24px, 560px); padding-top: 18px; }
+  .bangumi-page .bangumi-tabs { width: 100% !important; display: flex !important; }
+  .bangumi-page .bangumi-tab { flex: 1 !important; min-width: 0 !important; padding-inline: 8px !important; }
+  .bangumi-page .bangumi-show { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 11px; }
+  .bangumi-page .bangumi-picture { border-radius: 9px !important; }
+  .bangumi-page .bangumi-title { font-size: 13px !important; }
+}

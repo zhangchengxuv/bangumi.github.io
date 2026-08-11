@@ -1,0 +1,81 @@
+title: 漫游放映室
+subtitle: 把每一次心动，收进片单
+description: 我的动画观看记录、短评与放映手记
+keywords:
+  - 动画
+  - Bangumi
+  - 追番记录
+author: 829882
+language: zh-CN
+timezone: Asia/Shanghai
+
+url: https://example.github.io
+root: /
+permalink: posts/:title/
+pretty_urls:
+  trailing_index: false
+  trailing_html: false
+
+source_dir: source
+public_dir: public
+tag_dir: tags
+archive_dir: archives
+category_dir: categories
+code_dir: downloads/code
+i18n_dir: :lang
+skip_render: README.md
+
+new_post_name: :title.md
+default_layout: post
+titlecase: false
+external_link:
+  enable: true
+  field: site
+  exclude: ''
+filename_case: 0
+render_drafts: false
+post_asset_folder: false
+relative_link: false
+future: true
+
+index_generator:
+  path: ''
+  per_page: 8
+  order_by: -date
+
+per_page: 10
+pagination_dir: page
+
+theme: stargazer
+
+marked:
+  prependRoot: true
+  postAsset: true
+
+highlight:
+  enable: false
+prismjs:
+  enable: false
+
+bangumi:
+  enable: true
+  source: bgmv0
+  bgmInfoSource: bgmv0
+  path: bangumis/index.html
+  vmid: 829882
+  title: 我的追番地图
+  quote: '<span class="bangumi-quote-mark">✦</span> 在故事宇宙里，认真记录每一次相遇。'
+  theme: auto
+  show: 2
+  lazyload: true
+  srcValue: __image__
+  showMyComment: true
+  pagination: false
+  order: latest
+  webp: false
+  progress: true
+  progressBar: true
+  swup: false
+
+deploy:
+  type: ''
