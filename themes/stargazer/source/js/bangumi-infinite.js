@@ -193,6 +193,7 @@
 
     const items = ['wantWatch', 'watching', 'watched']
       .flatMap(key => Array.isArray(data[key]) ? data[key] : []);
+    container.dataset.collectionTotal = String(items.length);
     const panel = document.createElement('div');
     panel.id = `${media}-items`;
     panel.className = 'bangumi-show';
@@ -212,6 +213,7 @@
     const container = document.createElement('div');
     container.className = 'bangumi-container github-container';
     container.dataset.media = 'github';
+    container.dataset.collectionTotal = String(Number(data?.totalContributions || 0));
     container.hidden = true;
 
     if (!data?.username) {
@@ -272,11 +274,23 @@
     nav.setAttribute('aria-label', '收藏类型');
     const choices = [['anime', '动画'], ['book', '我的书籍'], ['game', '我的游戏'], ['github', 'GitHub 活动']];
 
-    const animeTotal = itemsOf(containers.anime.querySelector('.bangumi-show')).length;
+    containers.anime.dataset.collectionTotal = String(itemsOf(containers.anime.querySelector('.bangumi-show')).length);
+    const counterMeta = {
+      anime: { label: '\u89c2\u770b\u603b\u6570', unit: '\u90e8' },
+      book: { label: '\u4e66\u7c4d\u603b\u6570', unit: '\u672c' },
+      game: { label: '\u6e38\u620f\u603b\u6570', unit: '\u6b3e' },
+      github: { label: '\u603b\u6d3b\u52a8', unit: '\u6b21' }
+    };
     const counter = document.createElement('div');
     counter.className = 'collection-counter';
-    counter.setAttribute('aria-label', `\u89c2\u770b\u603b\u6570 ${animeTotal} \u90e8`);
-    counter.innerHTML = `<span>WATCHED SIGNALS</span><strong>${animeTotal}</strong><small>\u89c2\u770b\u603b\u6570</small>`;
+
+    const updateCounter = media => {
+      const total = Number(containers[media]?.dataset.collectionTotal || 0);
+      const meta = counterMeta[media];
+      counter.setAttribute('aria-label', `${meta.label} ${total} ${meta.unit}`);
+      counter.innerHTML = `<small>${meta.label}</small><strong>${total}</strong><span>${meta.unit}</span>`;
+    };
+    updateCounter('anime');
 
     choices.forEach(([media, label]) => {
       const button = document.createElement('button');
@@ -292,7 +306,7 @@
         });
         if (alphaNav) alphaNav.hidden = media === 'github';
         if (sentinel) sentinel.hidden = media === 'github';
-        counter.hidden = media !== 'anime';
+        updateCounter(media);
         if (media === 'github') {
           activePanel = null;
           return;

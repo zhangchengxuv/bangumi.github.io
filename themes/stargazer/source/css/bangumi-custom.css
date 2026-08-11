@@ -62,22 +62,31 @@ body.bangumi-route {
 
 .collection-toolbar {
   margin: 0 0 22px;
-  display: flex;
-  justify-content: space-between;
-  gap: 22px;
-  align-items: flex-end;
-}
-
-.collection-switch {
-  margin: 0;
-  display: inline-flex;
-  gap: 26px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
   border-bottom: 1px solid var(--line);
 }
 
+.collection-switch {
+  min-width: 0;
+  margin: 0;
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.collection-switch::-webkit-scrollbar { display: none; }
+
 .collection-switch button {
+  flex: 0 0 auto;
   position: relative;
   padding: 0 2px 11px;
+  white-space: nowrap;
   color: var(--muted);
   border: 0;
   background: transparent;
@@ -103,35 +112,34 @@ body.bangumi-route {
 .collection-switch button.active::after { transform: scaleX(1); }
 
 .collection-counter {
-  min-width: 138px;
-  padding: 9px 13px 10px;
-  display: grid;
-  justify-items: end;
+  margin-bottom: 7px;
+  padding: 5px 9px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
   border: 1px solid rgba(117, 170, 247, .22);
-  border-radius: 14px;
+  border-radius: 999px;
   background:
     linear-gradient(135deg, rgba(82, 144, 233, .13), rgba(255, 255, 255, .035));
   box-shadow: inset 0 1px rgba(255, 255, 255, .045);
+  white-space: nowrap;
 }
 
 .collection-counter[hidden] { display: none !important; }
 
-.collection-counter span {
-  color: #78adf7;
-  font: 700 8px/1.1 "DM Sans", sans-serif;
-  letter-spacing: .18em;
+.collection-counter small {
+  color: var(--muted);
+  font-size: 10px;
 }
 
 .collection-counter strong {
-  margin-top: 4px;
   color: #eff7ff;
-  font: 800 25px/1 "DM Sans", sans-serif;
+  font: 800 16px/1 "DM Sans", sans-serif;
 }
 
-.collection-counter small {
-  margin-top: 3px;
-  color: var(--muted);
-  font-size: 10px;
+.collection-counter span {
+  color: #78adf7;
+  font: 700 9px/1 "Noto Sans SC", sans-serif;
 }
 
 .bangumi-page .bangumi-quote { display: none !important; }
@@ -504,10 +512,13 @@ body.bangumi-route {
 
 @media (max-width: 640px) {
   .bangumi-page { width: min(100% - 48px, 540px); margin-left: 12px; margin-right: 36px; padding-top: 18px; }
-  .collection-toolbar { display: grid; gap: 12px; }
-  .collection-switch { width: 100%; gap: 0; justify-content: space-between; }
-  .collection-switch button { padding-inline: 0; font-size: 12px; }
-  .collection-counter { min-width: 0; width: fit-content; justify-items: start; }
+  .collection-toolbar { gap: 8px; }
+  .collection-switch { gap: 9px; }
+  .collection-switch button { padding: 7px 9px 10px; font-size: 12px; border-radius: 9px 9px 0 0; }
+  .collection-switch button:not(.active) { background: rgba(255, 255, 255, .025); }
+  .collection-counter { margin-bottom: 6px; padding: 5px 7px; gap: 3px; }
+  .collection-counter small { display: none; }
+  .collection-counter strong { font-size: 14px; }
   .bangumi-page .bangumi-tabs { width: 100% !important; display: flex !important; }
   .bangumi-page .bangumi-tab { flex: 1 !important; min-width: 0 !important; padding-inline: 8px !important; }
   .bangumi-page .bangumi-show { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 11px; }
