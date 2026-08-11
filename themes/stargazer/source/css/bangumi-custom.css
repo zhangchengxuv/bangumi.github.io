@@ -190,17 +190,33 @@ body.bangumi-route {
 
 .bangumi-page .bangumi-picture {
   position: relative !important;
+  isolation: isolate;
   width: 100% !important;
   height: auto !important;
+  aspect-ratio: 3 / 4;
   margin: 0 0 11px !important;
   overflow: hidden !important;
   border-radius: 12px !important;
-  background: transparent !important;
+  background: #111a28 !important;
+}
+
+.bangumi-page .bangumi-picture::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -10%;
+  pointer-events: none;
+  background-image: var(--cover-image);
+  background-position: center;
+  background-size: cover;
+  filter: blur(16px) brightness(.58) saturate(.9);
+  transform: scale(1.08);
 }
 
 .bangumi-page .bangumi-picture::after {
   content: "";
   position: absolute;
+  z-index: 2;
   inset: 0;
   pointer-events: none;
   background: linear-gradient(180deg, transparent 62%, rgba(0, 0, 0, .24));
@@ -208,19 +224,22 @@ body.bangumi-route {
 
 .bangumi-page .bangumi-picture img {
   width: 100% !important;
-  height: auto !important;
+  height: 100% !important;
   max-width: none !important;
   margin: 0 !important;
   display: block !important;
+  object-fit: contain !important;
   border-radius: 0 !important;
   box-shadow: none !important;
   transition: transform .35s ease !important;
 }
 
 .bangumi-page .bangumi-cover-link {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
 }
 
 .bangumi-page .bangumi-item:hover .bangumi-picture img { filter: brightness(1.06); }

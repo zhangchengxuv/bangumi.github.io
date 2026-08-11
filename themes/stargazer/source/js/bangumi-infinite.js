@@ -21,6 +21,11 @@
     '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
   })[character]);
 
+  function setCoverBackdrop(picture, image) {
+    const source = image?.currentSrc || image?.getAttribute('src') || image?.dataset.bangumiSrc;
+    if (picture && source) picture.style.setProperty('--cover-image', `url(${JSON.stringify(source)})`);
+  }
+
   function decorateItem(item, initialMap, detailBase) {
     const id = subjectIdOf(item);
     const titleLink = item.querySelector('.bangumi-title a');
@@ -38,6 +43,7 @@
 
     const picture = item.querySelector('.bangumi-picture');
     const image = picture?.querySelector('img');
+    setCoverBackdrop(picture, image);
     if (picture && image && image.parentElement === picture && id) {
       const coverLink = document.createElement('a');
       coverLink.className = 'bangumi-cover-link';
@@ -172,6 +178,7 @@
         <div class="bangumi-title"><a href="${detailUrl}">${title}</a></div>
         ${total ? `<div class="bangumi-progress"><div class="progress-bar" style="width:${percentage}%"></div></div>` : ''}
       </div>`;
+    setCoverBackdrop(element.querySelector('.bangumi-picture'), element.querySelector('.bangumi-picture img'));
     return element;
   }
 
