@@ -1,5 +1,5 @@
-<% if (page.path && page.path.startsWith('bangumis/')) { %>
-  <article class="bangumi-page shell" data-detail-base="<%- url_for('/bangumis/subject/') %>"><%- page.content %></article>
+<% if (page.path === 'index.html') { %>
+  <article class="bangumi-page shell" data-detail-base="<%- url_for('/subject/') %>"><%- page.content %></article>
 <% } else { %>
   <section class="page-hero shell compact">
     <p class="eyebrow"><span></span>ABOUT THE SCREENING ROOM</p>

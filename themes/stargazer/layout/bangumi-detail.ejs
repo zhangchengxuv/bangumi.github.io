@@ -3,7 +3,7 @@
 <% const isGame = item.media === 'game'; %>
 <% const progressCount = item.progressCount ?? item.ep_status ?? 0; %>
 <article class="subject-detail shell">
-  <a class="subject-back" href="<%- url_for('/bangumis/') %>">← 返回收藏列表</a>
+  <a class="subject-back" href="<%- url_for('/') %>">← 返回收藏列表</a>
   <div class="subject-card">
     <div class="subject-cover">
       <img src="<%- item.cover %>" alt="<%= item.title %>" referrerpolicy="no-referrer">

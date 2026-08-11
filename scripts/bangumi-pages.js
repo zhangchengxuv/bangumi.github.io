@@ -56,7 +56,7 @@ hexo.extend.generator.register('bangumi-subject-pages', function () {
   const items = [...animeItems, ...bookItems, ...gameItems];
 
   const pages = items.map(item => ({
-    path: `bangumis/subject/${item.id}/index.html`,
+    path: `subject/${item.id}/index.html`,
     layout: 'bangumi-detail',
     data: {
       title: item.title,
@@ -65,17 +65,17 @@ hexo.extend.generator.register('bangumi-subject-pages', function () {
   }));
 
   pages.push({
-    path: 'bangumis/initials.json',
+    path: 'initials.json',
     data: JSON.stringify(Object.fromEntries(items.map(item => [String(item.id), getInitial(item.title)]))),
   });
 
   pages.push({
-    path: 'bangumis/books.json',
+    path: 'books.json',
     data: JSON.stringify(withInitials(bookData, 'book')),
   });
 
   pages.push({
-    path: 'bangumis/games.json',
+    path: 'games.json',
     data: JSON.stringify(withInitials(gameData, 'game')),
   });
 

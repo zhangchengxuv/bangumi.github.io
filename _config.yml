@@ -9,8 +9,8 @@ author: 829882
 language: zh-CN
 timezone: Asia/Shanghai
 
-url: https://example.github.io
-root: /
+url: https://zhangchengxuv.github.io/bgm
+root: /bgm/
 permalink: posts/:title/
 pretty_urls:
   trailing_index: false
@@ -61,7 +61,7 @@ bangumi:
   enable: true
   source: bgmv0
   bgmInfoSource: bgmv0
-  path: bangumis/index.html
+  path: index.html
   vmid: 829882
   title: 我的追番地图
   quote: '<span class="bangumi-quote-mark">✦</span> 在故事宇宙里，认真记录每一次相遇。'
