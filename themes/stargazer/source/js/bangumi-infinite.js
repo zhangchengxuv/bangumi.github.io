@@ -230,15 +230,28 @@
     const timeFormatter = new Intl.DateTimeFormat('zh-CN', {
       month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
     });
-    const weeks = Array.isArray(data.weeks) ? data.weeks : [];
     const commits = Array.isArray(data.commits) ? data.commits : [];
-    const calendar = weeks.map(week => `
+    const renderCalendar = weeks => (Array.isArray(weeks) ? weeks : []).map(week => `
       <div class="contribution-week">
         ${(week.contributionDays || []).map(day => `
           <span class="contribution-day level-${contributionLevel(Number(day.contributionCount))}"
             style="grid-row:${Number(day.weekday) + 1}"
             title="${escapeHTML(day.date)} · ${Number(day.contributionCount)} 次贡献"></span>`).join('')}
       </div>`).join('');
+    const fallbackYear = new Date(data.to || Date.now()).getFullYear();
+    const years = Array.isArray(data.years) && data.years.length
+      ? data.years
+      : [{ year: fallbackYear, totalContributions: data.totalContributions, weeks: data.weeks }];
+    const calendars = years.map(item => `
+      <section class="contribution-year">
+        <div class="contribution-year-heading">
+          <strong>${Number(item.year)}</strong>
+          <span>${Number(item.totalContributions || 0)} 次贡献</span>
+        </div>
+        <div class="contribution-scroll">
+          <div class="contribution-calendar">${renderCalendar(item.weeks)}</div>
+        </div>
+      </section>`).join('');
     const commitItems = commits.map(commit => `
       <article class="github-commit">
         <div class="commit-mark" aria-hidden="true"></div>
@@ -261,19 +274,20 @@
         <div class="github-profile-copy">
           <span>GITHUB OBSERVER</span>
           <a href="${escapeHTML(data.profileUrl)}" target="_blank" rel="noopener">@${escapeHTML(data.username)}</a>
-          <small>公开开发活动 · 每日自动同步</small>
+          <small>全部历史活动 · 每日自动同步</small>
         </div>
-        <div class="github-total">
-          <strong>${Number(data.totalContributions || 0)}</strong>
-          <span>近一年贡献</span>
+        <div class="github-stats" aria-label="全部历史活动统计">
+          <div class="github-stat total"><strong>${Number(data.totalContributions || 0)}</strong><span>总活动</span></div>
+          <div class="github-stat public"><strong>${Number(data.publicContributions ?? data.totalContributions ?? 0)}</strong><span>公开活动</span></div>
+          <div class="github-stat private" title="只显示数量，不公开仓库或提交详情"><strong>${Number(data.privateCommits || 0)}</strong><span>私有提交</span></div>
         </div>
       </section>
       <section class="github-panel contribution-panel">
         <div class="github-panel-heading">
-          <div><span>CONTRIBUTION ACTIVITY</span><h2>贡献轨迹</h2></div>
+          <div><span>ALL CONTRIBUTION ACTIVITY</span><h2>全部贡献轨迹</h2></div>
           <small>${dateFormatter.format(new Date(data.from))} — ${dateFormatter.format(new Date(data.to))}</small>
         </div>
-        <div class="contribution-scroll"><div class="contribution-calendar">${calendar}</div></div>
+        <div class="contribution-years">${calendars}</div>
         <div class="contribution-legend"><span>少</span>${[0, 1, 2, 3, 4].map(level => `<i class="level-${level}"></i>`).join('')}<span>多</span></div>
       </section>
       <section class="github-panel commit-panel">

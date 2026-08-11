@@ -30,18 +30,57 @@ async function request(url, options = {}) {
   return response.json();
 }
 
-async function getContributionCalendar() {
-  const to = new Date();
-  const from = new Date(to);
-  from.setUTCFullYear(from.getUTCFullYear() - 1);
+async function getProfileAndContributionYears() {
   const query = `
-    query Activity($login: String!, $from: DateTime!, $to: DateTime!) {
+    query Profile($login: String!) {
       user(login: $login) {
         login
         name
         avatarUrl
         url
+        contributionsCollection {
+          contributionYears
+        }
+      }
+    }`;
+  const payload = await request('https://api.github.com/graphql', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, variables: { login: username } }),
+  });
+  if (payload.errors?.length) throw new Error(payload.errors.map(error => error.message).join('; '));
+  if (!payload.data?.user) throw new Error(`GitHub user ${username} was not found.`);
+  const profile = payload.data.user;
+  const years = [...new Set(profile.contributionsCollection.contributionYears || [])]
+    .map(Number)
+    .filter(Number.isFinite)
+    .sort((left, right) => right - left);
+  delete profile.contributionsCollection;
+  return { profile, years };
+}
+
+async function getContributionsForYear(year) {
+  const now = new Date();
+  const currentYear = now.getUTCFullYear();
+  const from = new Date(Date.UTC(year, 0, 1));
+  const to = year === currentYear
+    ? now
+    : new Date(Date.UTC(year, 11, 31, 23, 59, 59));
+  const query = `
+    query Activity($login: String!, $from: DateTime!, $to: DateTime!) {
+      user(login: $login) {
         contributionsCollection(from: $from, to: $to) {
+          restrictedContributionsCount
+          commitContributionsByRepository(maxRepositories: 100) {
+            repository {
+              isPrivate
+            }
+            contributions(first: 100) {
+              nodes {
+                commitCount
+              }
+            }
+          }
           contributionCalendar {
             totalContributions
             weeks {
@@ -65,11 +104,36 @@ async function getContributionCalendar() {
   });
   if (payload.errors?.length) throw new Error(payload.errors.map(error => error.message).join('; '));
   if (!payload.data?.user) throw new Error(`GitHub user ${username} was not found.`);
+  const collection = payload.data.user.contributionsCollection;
+  const visiblePrivateCommits = collection.commitContributionsByRepository
+    .filter(group => group.repository.isPrivate)
+    .flatMap(group => group.contributions.nodes)
+    .reduce((total, contribution) => total + contribution.commitCount, 0);
   return {
-    profile: payload.data.user,
-    calendar: payload.data.user.contributionsCollection.contributionCalendar,
+    year,
+    totalContributions: collection.contributionCalendar.totalContributions,
+    publicContributions: Math.max(0, collection.contributionCalendar.totalContributions - Math.max(collection.restrictedContributionsCount, visiblePrivateCommits)),
+    privateCommits: Math.max(collection.restrictedContributionsCount, visiblePrivateCommits),
     from: from.toISOString(),
     to: to.toISOString(),
+    weeks: collection.contributionCalendar.weeks,
+  };
+}
+
+async function getContributionHistory() {
+  const { profile, years } = await getProfileAndContributionYears();
+  const currentYear = new Date().getUTCFullYear();
+  const contributionYears = years.length ? years : [currentYear];
+  const yearly = await Promise.all(contributionYears.map(getContributionsForYear));
+  yearly.sort((left, right) => right.year - left.year);
+  return {
+    profile,
+    years: yearly,
+    totalContributions: yearly.reduce((total, item) => total + item.totalContributions, 0),
+    publicContributions: yearly.reduce((total, item) => total + item.publicContributions, 0),
+    privateCommits: yearly.reduce((total, item) => total + item.privateCommits, 0),
+    from: yearly.at(-1).from,
+    to: yearly[0].to,
   };
 }
 
@@ -116,8 +180,8 @@ async function getRecentCommits() {
 }
 
 (async () => {
-  const [{ profile, calendar, from, to }, commits] = await Promise.all([
-    getContributionCalendar(),
+  const [{ profile, years, totalContributions, publicContributions, privateCommits, from, to }, commits] = await Promise.all([
+    getContributionHistory(),
     getRecentCommits(),
   ]);
   const data = {
@@ -125,15 +189,18 @@ async function getRecentCommits() {
     name: profile.name || profile.login,
     avatarUrl: profile.avatarUrl,
     profileUrl: profile.url,
-    totalContributions: calendar.totalContributions,
+    totalContributions,
+    publicContributions,
+    privateCommits,
     from,
     to,
     generatedAt: new Date().toISOString(),
-    weeks: calendar.weeks,
+    years,
+    weeks: years[0]?.weeks || [],
     commits,
   };
   fs.writeFileSync(outputPath, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
-  console.log(`Synced ${data.totalContributions} contributions and ${commits.length} commits for ${username}.`);
+  console.log(`Synced ${data.totalContributions} contributions (${data.privateCommits} private) across ${years.length} years and ${commits.length} public commits for ${username}.`);
 })().catch(error => {
   console.error(error);
   process.exitCode = 1;
