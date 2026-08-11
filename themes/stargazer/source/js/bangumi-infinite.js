@@ -205,11 +205,92 @@
     return container;
   }
 
+  function contributionLevel(count) {
+    if (!count) return 0;
+    if (count < 2) return 1;
+    if (count < 4) return 2;
+    if (count < 7) return 3;
+    return 4;
+  }
+
+  function createGithubContainer(data) {
+    const container = document.createElement('div');
+    container.className = 'bangumi-container github-container';
+    container.dataset.media = 'github';
+    container.hidden = true;
+
+    if (!data?.username) {
+      container.innerHTML = '<p class="collection-empty">GitHub 活动数据暂时不可用</p>';
+      return container;
+    }
+
+    const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
+      year: 'numeric', month: 'short', day: 'numeric'
+    });
+    const timeFormatter = new Intl.DateTimeFormat('zh-CN', {
+      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+    const weeks = Array.isArray(data.weeks) ? data.weeks : [];
+    const commits = Array.isArray(data.commits) ? data.commits : [];
+    const calendar = weeks.map(week => `
+      <div class="contribution-week">
+        ${(week.contributionDays || []).map(day => `
+          <span class="contribution-day level-${contributionLevel(Number(day.contributionCount))}"
+            style="grid-row:${Number(day.weekday) + 1}"
+            title="${escapeHTML(day.date)} · ${Number(day.contributionCount)} 次贡献"></span>`).join('')}
+      </div>`).join('');
+    const commitItems = commits.map(commit => `
+      <article class="github-commit">
+        <div class="commit-mark" aria-hidden="true"></div>
+        <div class="commit-copy">
+          <a class="commit-message" href="${escapeHTML(commit.url)}" target="_blank" rel="noopener">${escapeHTML(commit.message || '更新代码')}</a>
+          <div class="commit-meta">
+            <a href="${escapeHTML(commit.repositoryUrl)}" target="_blank" rel="noopener">${escapeHTML(commit.repository)}</a>
+            <span>${escapeHTML(commit.branch || 'default')}</span>
+            <code>${escapeHTML(commit.shortSha)}</code>
+            <time datetime="${escapeHTML(commit.committedAt)}">${timeFormatter.format(new Date(commit.committedAt))}</time>
+          </div>
+        </div>
+      </article>`).join('');
+
+    container.innerHTML = `
+      <section class="github-profile-card">
+        <a class="github-avatar" href="${escapeHTML(data.profileUrl)}" target="_blank" rel="noopener">
+          <img src="${escapeHTML(data.avatarUrl)}" alt="${escapeHTML(data.username)}" referrerpolicy="no-referrer">
+        </a>
+        <div class="github-profile-copy">
+          <span>GITHUB OBSERVER</span>
+          <a href="${escapeHTML(data.profileUrl)}" target="_blank" rel="noopener">@${escapeHTML(data.username)}</a>
+          <small>公开开发活动 · 每日自动同步</small>
+        </div>
+        <div class="github-total">
+          <strong>${Number(data.totalContributions || 0)}</strong>
+          <span>近一年贡献</span>
+        </div>
+      </section>
+      <section class="github-panel contribution-panel">
+        <div class="github-panel-heading">
+          <div><span>CONTRIBUTION ACTIVITY</span><h2>贡献轨迹</h2></div>
+          <small>${dateFormatter.format(new Date(data.from))} — ${dateFormatter.format(new Date(data.to))}</small>
+        </div>
+        <div class="contribution-scroll"><div class="contribution-calendar">${calendar}</div></div>
+        <div class="contribution-legend"><span>少</span>${[0, 1, 2, 3, 4].map(level => `<i class="level-${level}"></i>`).join('')}<span>多</span></div>
+      </section>
+      <section class="github-panel commit-panel">
+        <div class="github-panel-heading">
+          <div><span>RECENT COMMITS</span><h2>近期公开提交</h2></div>
+          <small>${commits.length} 条记录</small>
+        </div>
+        <div class="commit-list">${commitItems || '<p class="collection-empty">最近暂无公开 commit</p>'}</div>
+      </section>`;
+    return container;
+  }
+
   function createMediaSwitch(page, containers) {
     const nav = document.createElement('div');
     nav.className = 'collection-switch';
     nav.setAttribute('aria-label', '收藏类型');
-    const choices = [['anime', '动画'], ['book', '我的书籍'], ['game', '我的游戏']];
+    const choices = [['anime', '动画'], ['book', '我的书籍'], ['game', '我的游戏'], ['github', 'GitHub 活动']];
 
     choices.forEach(([media, label]) => {
       const button = document.createElement('button');
@@ -223,6 +304,12 @@
         Object.entries(containers).forEach(([key, container]) => {
           container.hidden = key !== media;
         });
+        if (alphaNav) alphaNav.hidden = media === 'github';
+        if (sentinel) sentinel.hidden = media === 'github';
+        if (media === 'github') {
+          activePanel = null;
+          return;
+        }
         const container = containers[media];
         activate(container.querySelector('.bangumi-show'));
       });
@@ -232,6 +319,7 @@
     page.insertBefore(nav, containers.anime);
     containers.anime.insertAdjacentElement('afterend', containers.book);
     containers.book.insertAdjacentElement('afterend', containers.game);
+    containers.game.insertAdjacentElement('afterend', containers.github);
   }
 
   async function init() {
@@ -245,15 +333,18 @@
     let initialMap = {};
     let bookData = { wantWatch: [], watching: [], watched: [] };
     let gameData = { wantWatch: [], watching: [], watched: [] };
+    let githubData = null;
     try {
-      const [initialResponse, bookResponse, gameResponse] = await Promise.all([
+      const [initialResponse, bookResponse, gameResponse, githubResponse] = await Promise.all([
         fetch(new URL('initials.json', window.location.href)),
         fetch(new URL('books.json', window.location.href)),
-        fetch(new URL('games.json', window.location.href))
+        fetch(new URL('games.json', window.location.href)),
+        fetch(new URL('github-activity.json', window.location.href))
       ]);
       if (initialResponse.ok) initialMap = await initialResponse.json();
       if (bookResponse.ok) bookData = await bookResponse.json();
       if (gameResponse.ok) gameData = await gameResponse.json();
+      if (githubResponse.ok) githubData = await githubResponse.json();
     } catch (_) {
       // 动画列表仍可使用；同步失败时书籍分类显示为空。
     }
@@ -281,7 +372,13 @@
       media: 'game',
       noun: '游戏'
     });
-    createMediaSwitch(page, { anime: animeContainer, book: bookContainer, game: gameContainer });
+    const githubContainer = createGithubContainer(githubData);
+    createMediaSwitch(page, {
+      anime: animeContainer,
+      book: bookContainer,
+      game: gameContainer,
+      github: githubContainer
+    });
     createAlphaNav();
 
     sentinel = document.createElement('div');

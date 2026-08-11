@@ -37,6 +37,11 @@ jobs:
       - name: Sync Bangumi collection
         run: npm run sync:bangumi
 
+      - name: Sync GitHub activity
+        run: npm run sync:github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build site
         run: npm run build
 
